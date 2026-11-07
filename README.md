@@ -196,3 +196,7 @@ The standalone 910B4 benchmark reported 2.3774x at 1,024 batches with
 first-word-only timed output; full eight-word correctness was checked separately.
 This is not a measured production TH/s improvement. The integrated production
 code has not been compiled or tested on CANN / 910B4 / 910C.
+
+### CANN 9.1 CI build path (v2)
+
+The build automatically resolves `ascendc.cmake` from CANN Toolkit layouts such as `${ASCEND_HOME_PATH}/tools/tikcpp/ascendc_kernel_cmake` and `${ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake`. Do not hardcode `${ASCEND_HOME_PATH}/tikcpp/ascendc_kernel_cmake`. In case of custom Toolkit layout, set `ASCENDC_CMAKE_DIR` to the directory containing `ascendc.cmake`. See `RUNTIME850_MIGRATION.md`.

@@ -16,19 +16,15 @@ set(SOC_VERSION "Ascend910B4" CACHE STRING "NPU SoC for fatbin")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pearl_build_config.h.in"
                "${CMAKE_CURRENT_SOURCE_DIR}/pearl_build_config_generated.h" @ONLY)
 
-# CANN 9.1 SDK non-hybrid compile mode; each target installs a standalone .o.
-if(NOT ASCENDC_CMAKE_DIR)
-  if(DEFINED ENV{ASCENDC_CMAKE_DIR})
-    set(ASCENDC_CMAKE_DIR "$ENV{ASCENDC_CMAKE_DIR}")
-  elseif(DEFINED ENV{ASCEND_HOME_PATH})
-    set(ASCENDC_CMAKE_DIR "$ENV{ASCEND_HOME_PATH}/tikcpp/ascendc_kernel_cmake")
-  elseif(DEFINED ENV{ASC_MODULES})
-    get_filename_component(ASCENDC_CMAKE_DIR "$ENV{ASC_MODULES}" DIRECTORY)
+# CANN 9.1 SDK non-hybrid compile mode, using the actual installed Toolkit layout.
+# Note: installed CANN layout is commonly tools/tikcpp or compiler/tikcpp,
+# NOT $ASCEND_HOME_PATH/tikcpp. This resolver also handles CI path aliases.
+if(NOT ASCEND_CANN_PACKAGE_PATH)
+  if(DEFINED ENV{ASCEND_HOME_PATH} AND NOT "$ENV{ASCEND_HOME_PATH}" STREQUAL "")
+    set(ASCEND_CANN_PACKAGE_PATH "$ENV{ASCEND_HOME_PATH}")
   endif()
 endif()
-if(NOT EXISTS "${ASCENDC_CMAKE_DIR}/ascendc.cmake")
-  message(FATAL_ERROR "ascendc.cmake not found at ${ASCENDC_CMAKE_DIR}; export ASCENDC_CMAKE_DIR from CANN 9.1 Toolkit")
-endif()
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResolveAscendCFatbin.cmake")
 include("${ASCENDC_CMAKE_DIR}/ascendc.cmake")
 ascendc_fatbin_library(pearl_cube pearl_hlc2_cube_device.cpp)
 ascendc_fatbin_library(pearl_vec  pearl_hlc2_vec_device.cpp)

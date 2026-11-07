@@ -16,8 +16,12 @@
 
 ```bash
 source /usr/local/Ascend/cann-9.1.0/set_env.sh
-export ASC_MODULES=/usr/local/Ascend/cann-9.1.0/aarch64-linux/tikcpp/ascendc_kernel_cmake/asc_modules
-export ASCENDC_CMAKE_DIR=/usr/local/Ascend/cann-9.1.0/aarch64-linux/tikcpp/ascendc_kernel_cmake
+# No need to hardcode ASCENDC_CMAKE_DIR: CMake auto-detects
+# $ASCEND_HOME_PATH/tools/tikcpp/... or compiler/tikcpp/...
+# If detection fails, inspect the installed Toolkit:
+find "$ASCEND_HOME_PATH" -name ascendc.cmake -print 2>/dev/null
+# Or override with the *directory* that contains ascendc.cmake:
+# export ASCENDC_CMAKE_DIR=/absolute/path/to/ascendc_kernel_cmake
 make RANK=128 kernel
 # 首先应看到三个文件：
 ls -lh build/libpearl_hlc2.so build/pearl_cube.o build/pearl_vec.o
@@ -26,7 +30,7 @@ readelf -Ws build/libpearl_hlc2.so | grep -E 'rtRegisterFuncSymbol|rtRegisterVar
 make RANK=128 proof miner
 ```
 
-**注意**：如实际 toolkit 中 `ascendc.cmake` 不在上面的候选目录，请用 `find /usr/local/Ascend/cann-9.1.0 -name ascendc.cmake` 找到正确目录，设置 `ASCENDC_CMAKE_DIR`。
+**注意**：如实际 toolkit 中 `ascendc.cmake` 不在上面的候选目录，请用 `find "$ASCEND_HOME_PATH" -name ascendc.cmake` 找到正确目录，设置 `ASCENDC_CMAKE_DIR`。
 
 **CMake 注意**：移植包使用 `find_package(ASC)` 与 `ascendc_fatbin_library()` 组合。若实际 9.1 SDK 的 CMake 版本不允许组合，需要以 9.1 Toolkit 实机反馈调整 CMake 配置。本机没有 CANN 工具链，因此没有宣称编译成功。
 
@@ -60,3 +64,10 @@ Kernel 默认从 `libpearl_hlc2.so` 所在目录自动找 `pearl_cube.o`、`pear
 - CANN 9.1，Custom Operator Loading，非混合编程：https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/910/others/acldevg/runtime_doc_dev_0019.html
 - CANN 8.5，Runtime Kernel Loading API：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/850/API/appdevgapi/aclcppdevg_03_1825.html
 - CANN 9.1 `ascendc_fatbin_library`：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta2/programug/Ascendcopdevg/docs/guide/%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/%E9%99%84%E5%BD%95/%E7%AE%80%E6%98%93%E8%87%AA%E5%AE%9A%E4%B9%89%E7%AE%97%E5%AD%90%E5%B7%A5%E7%A8%8B.md
+
+## GitHub Actions 修复记录（CMake Path Fix v2）
+
+- 修正最初错误的 `$ASCEND_HOME_PATH/tikcpp/ascendc_kernel_cmake` 单一路径假设。
+- 新增 `kernel/cmake/ResolveAscendCFatbin.cmake`，优先选择 Toolkit 正式路径 `tools/tikcpp/ascendc_kernel_cmake` 或 `compiler/tikcpp/ascendc_kernel_cmake`，兼容架构相关路径及自定义 `ASCENDC_CMAKE_DIR`。
+- CI 会打印实际 `ASCEND_HOME_PATH`、`ASC_MODULES` 与 `ascendc.cmake` 文件路径，避免猜测 runner 目录。
+- 注意：解决当前 CMake 配置错误，不代表已经通过 CANN 9.1 编译或 CANN 8.5 设备端加载验证。
