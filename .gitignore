@@ -9,3 +9,6 @@ challenge_solver
 .DS_Store
 pearl
 releases/
+
+# Regenerated for both Host and fatbin by kernel/CMakeLists.txt
+kernel/pearl_build_config_generated.h
