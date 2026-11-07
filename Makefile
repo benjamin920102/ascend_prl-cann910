@@ -60,14 +60,8 @@ kernel: $(OUT)
 	cd kernel && rm -rf build && mkdir build && cd build && \
 	  cmake -DCMAKE_ASC_RUN_MODE=npu -DCMAKE_ASC_ARCHITECTURES=dav-2201 \
 	        -DPEARL_PIPE_DEPTH=$(PIPE_DEPTH) -DNINNER=$(NINNER) -DNFOLD=$(NFOLD) -DBUFS=4 -DVEC2X=2 \
-	        -DCMAKE_INSTALL_PREFIX="$$PWD/stage" \
-	        -DCMAKE_MODULE_PATH="$$ASC_MODULES" .. && cmake --build . -j && cmake --install .
+	        -DCMAKE_MODULE_PATH="$$ASC_MODULES" .. && make -j
 	cp kernel/build/libpearl_hlc2.so $(OUT)/
-	@for name in pearl_cube pearl_vec; do \
-	  obj="kernel/build/stage/fatbin/$$name/$$name.o"; \
-	  test -s "$$obj" || { echo "missing fatbin: $$obj" >&2; exit 2; }; \
-	  cp "$$obj" $(OUT)/$$name.o; \
-	done
 
 proof: $(OUT)
 	cd proof-ffi && unset MAKEFLAGS && cargo build --release

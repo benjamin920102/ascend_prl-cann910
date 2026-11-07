@@ -197,7 +197,3 @@ Host 強制要求 `n_hi=64`，不符合時直接報錯，避免悄悄切換回 S
 獨立 910B4 Benchmark 的 2.3774x 來自只計時第一個輸出 Word 的測試；
 八個 Words 的正確性另外驗證。此數字不代表正式版 TH/s。
 本版遵照要求未編譯、未執行測試，尚未經 910B4／910C 實機確認。
-
-### CANN 9.1 CI build path (v2)
-
-The build automatically resolves `ascendc.cmake` from CANN Toolkit layouts such as `${ASCEND_HOME_PATH}/tools/tikcpp/ascendc_kernel_cmake` and `${ASCEND_HOME_PATH}/compiler/tikcpp/ascendc_kernel_cmake`. Do not hardcode `${ASCEND_HOME_PATH}/tikcpp/ascendc_kernel_cmake`. In case of custom Toolkit layout, set `ASCENDC_CMAKE_DIR` to the directory containing `ascendc.cmake`. See `RUNTIME850_MIGRATION.md`.

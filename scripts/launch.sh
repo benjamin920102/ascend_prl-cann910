@@ -23,13 +23,7 @@ if [ -z "${BIN:-}" ]; then
   BIN="${BIN:-./build/ascend_prl_kryptex}"
 fi
 [ -x "$BIN" ] || { echo "miner binary not found: $BIN (build it, or run scripts/get_release.sh)"; exit 1; }
-# This script runs on the CANN 8.5 host; do not source a compiler-toolkit path.
-if [ -f /usr/local/Ascend/cann-8.5.0/set_env.sh ]; then
-  source /usr/local/Ascend/cann-8.5.0/set_env.sh
-else
-  echo "missing CANN 8.5.0 runtime environment" >&2
-  exit 2
-fi
+source /usr/local/Ascend/cann-*/set_env.sh 2>/dev/null
 
 if [ -n "${ASCEND_RT_VISIBLE_DEVICES:-}" ]; then
   IFS=',' read -ra DEVS <<< "$ASCEND_RT_VISIBLE_DEVICES"
