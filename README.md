@@ -65,7 +65,7 @@ PRL_COEXIST_GUARD=1 ASCEND_RT_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 ./scripts/launch.s
 ## Build
 
 Requirements: 
-- CANN 9.0.0 toolchain + Ascend-C compiler 
+- CANN 9.1.0 toolchain + Ascend-C compiler 
 - `gcc` with `-march=armv8-a+crypto` (NEON BLAKE3)
 - `cmake ≥ 3.16`.
 - BLAKE3 C sources (the `blake3-1.x/c` dir — vendored, or from the cargo registry).

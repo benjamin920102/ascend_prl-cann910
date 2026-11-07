@@ -66,7 +66,7 @@ PRL_COEXIST_GUARD=1 ASCEND_RT_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 ./scripts/launch.s
 ## 编译
 
 依赖：
-- CANN 9.0.0 工具链 + Ascend-C 编译器
+- CANN 9.1.0 工具链 + Ascend-C 编译器
 - 支持 `-march=armv8-a+crypto` 的 `gcc`（用于 NEON 版 BLAKE3）
 - `cmake ≥ 3.16`
 - BLAKE3 的 C 源码（`blake3-1.x/c` 目录 —— 已随仓库附带，或取自 cargo registry）
