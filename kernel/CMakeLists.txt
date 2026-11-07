@@ -32,6 +32,12 @@ ascendc_fatbin_library(pearl_vec  pearl_hlc2_vec_device.cpp)
 # Only ordinary Host C++ goes into libpearl_hlc2.so. No <<< >>> calls or registration stubs.
 add_library(pearl_hlc2 SHARED pearl_hlc2_host.cpp pearl_kernel_loader.cpp)
 set_target_properties(pearl_hlc2 PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+# find_package(ASC) configures the ASC language/device build, but does not
+# necessarily propagate the installed CANN Host headers to this ordinary CXX target.
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResolveCANNHostIncludes.cmake")
+pearl_resolve_cann_host_includes(_pearl_host_includes)
+target_include_directories(pearl_hlc2 PRIVATE ${_pearl_host_includes})
 target_compile_definitions(pearl_hlc2 PRIVATE _GLIBCXX_USE_CXX11_ABI=0)
 target_link_libraries(pearl_hlc2 PRIVATE tiling_api platform ascendcl m dl pthread)
 # Runtime 8.5 must provide all required exported functions; detect unresolved at link time.

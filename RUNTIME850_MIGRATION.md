@@ -71,3 +71,27 @@ Kernel 默认从 `libpearl_hlc2.so` 所在目录自动找 `pearl_cube.o`、`pear
 - 新增 `kernel/cmake/ResolveAscendCFatbin.cmake`，优先选择 Toolkit 正式路径 `tools/tikcpp/ascendc_kernel_cmake` 或 `compiler/tikcpp/ascendc_kernel_cmake`，兼容架构相关路径及自定义 `ASCENDC_CMAKE_DIR`。
 - CI 会打印实际 `ASCEND_HOME_PATH`、`ASC_MODULES` 与 `ascendc.cmake` 文件路径，避免猜测 runner 目录。
 - 注意：解决当前 CMake 配置错误，不代表已经通过 CANN 9.1 编译或 CANN 8.5 设备端加载验证。
+
+## v4: Fix `acl/acl.h` and `kernel_tiling/kernel_tiling.h` on CANN 9.1 CI
+
+The Host shared library is compiled by CXX rather than the ASC language target.
+`find_package(ASC REQUIRED)` does not guarantee Host C++ inherits the CANN include
+directories, so v4 adds `cmake/ResolveCANNHostIncludes.cmake` and attaches
+the verified include paths directly to `pearl_hlc2` via `target_include_directories`.
+
+The resolver searches the installed Toolkit root(s), reports the actual files it
+finds, and fails early with actionable diagnostics if the header files are absent.
+It supports both `${ASCEND_HOME_PATH}/include` and the arch-specific
+`aarch64-linux/ascendc/include/highlevel_api` layout. It does **not** copy
+SDK headers into the project.
+
+Expected configure messages:
+```text
+-- CANN Host acl include: .../include
+-- CANN Host tiling include: .../include
+-- CANN Host kernel_tiling include: .../include/ascendc/highlevel_api
+```
+
+Re-run `make RANK=128 kernel`. After compilation, run
+`ldd -r build/libpearl_hlc2.so` on the CANN 8.5 runtime host; the Host ABI and
+Device .o compatibility are still not verified by these include-path changes.
