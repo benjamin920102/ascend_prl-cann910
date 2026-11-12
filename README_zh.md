@@ -197,3 +197,7 @@ Host 強制要求 `n_hi=64`，不符合時直接報錯，避免悄悄切換回 S
 獨立 910B4 Benchmark 的 2.3774x 來自只計時第一個輸出 Word 的測試；
 八個 Words 的正確性另外驗證。此數字不代表正式版 TH/s。
 本版遵照要求未編譯、未執行測試，尚未經 910B4／910C 實機確認。
+
+## GM Flag 直通（bypass DCache）
+
+此版固定讓 Cube／Vector 的 producer/consumer flag 使用 `ReadGmByPassDCache` / `WriteGmByPassDCache`，避免每次輪詢做 DCache `dcci`。保留必需的跨核依賴等待與同步；`dav-2201` 的 Flag 儲存起點改為 128B 對齊。不需要新增編譯參數；直接執行原本的 `make kernel` 即使用 bypass DCache，且不保留 DCache 模式開關。見 [技術說明](docs/FLAG_BYPASS.md)。

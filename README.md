@@ -196,3 +196,7 @@ The standalone 910B4 benchmark reported 2.3774x at 1,024 batches with
 first-word-only timed output; full eight-word correctness was checked separately.
 This is not a measured production TH/s improvement. The integrated production
 code has not been compiled or tested on CANN / 910B4 / 910C.
+
+## GM flag bypass-DCache transport
+
+Cube producer / vector consumer flags always use direct GM reads/writes (`ReadGmByPassDCache` / `WriteGmByPassDCache`, CANN 9.1 spelling). Hot-path `dcci` on flags is removed; ring-buffer ordering and required acquire/release pipeline fences remain. Flag bases are 128-byte aligned for dav-2201 compatibility. No bypass build flag is needed or supported; run `make kernel` as usual. See [details](docs/FLAG_BYPASS.md). This does **not** remove genuine producer/consumer dependencies, and device speedups are not yet verified.
